@@ -1,4 +1,10 @@
-Spawning a New Process
+# Three Primitives Required for Concurrency
+
+1. Spawning new processes
+2. Sending messages
+3. Receiving messages
+
+## Spawning a New Process
 
     iex(1)> f = fn() -> 2 + 2 end
     #Function<20.99386804/0 in :erl_eval.expr/5>
@@ -36,7 +42,7 @@ Shell itself is a process:
     iex(6)> self()
     #PID<0.85.0>
     
-Sending Messages
+## Sending Messages
 
     iex(1)> send(self(), :hello)
     :hello
@@ -56,7 +62,7 @@ To see contents of mailbox for a shell use:
     :world
     :ok
 
-Receiving Messages
+## Receiving Messages
 
 Let's write a simple program: dolphins.ex.
 
@@ -88,5 +94,4 @@ Re-start process (since it terminated):
  2. Mailbox is empty. Waits...
  3. When message is received it is matched against a given pattern.
  4. _ is a catch-all pattern.
-
 
