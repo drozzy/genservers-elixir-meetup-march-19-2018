@@ -116,3 +116,35 @@ We need to flush to see the messages we got:
     "How about no?"
     :ok
     
+# Recursion
+
+To solve the problem of the process always terminating, we need
+to call the function again to receive more messages.
+
+See dolphin3 in dolphins.ex. 
+
+    iex(1)> c("dolphins.ex")                         
+    [Dolphins]
+    iex(2)> dolphin3 = spawn(Dolphins, :dolphin3, [])
+    #PID<0.153.0>
+
+Now process will keep going:
+
+    iex(3)> send dolphin3, {self(), :do_a_flip}
+    {#PID<0.85.0>, :do_a_flip}
+    iex(4)> send dolphin3, {self(), :do_a_flip}
+    {#PID<0.85.0>, :do_a_flip}
+    iex(5)> flush()
+    "How about no?"
+    "How about no?"
+    :ok
+
+Sending `:fish` message wil stop the process:
+
+    iex(6)> send dolphin3, {self(), :fish}     
+    {#PID<0.85.0>, :fish}
+    iex(7)> flush()
+    "So long and thanks for all the fish!"
+    :ok
+
+
