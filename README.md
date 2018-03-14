@@ -26,6 +26,12 @@ To go to previous slide do:
 
     git prev
 
+To restore vim folds, issue from within vim:
+
+    :source folds.v
+
+## References
+
 Based on the idea of using git for a live coding sessions:
 https://blog.jayway.com/2015/03/30/using-git-commits-to-drive-a-live-coding-session/
 

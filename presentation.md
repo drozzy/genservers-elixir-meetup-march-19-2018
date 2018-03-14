@@ -4,7 +4,7 @@
 2. Sending messages
 3. Receiving messages
 
-## Spawning a New Process
+## 1. Spawning a New Process
 
     iex(1)> f = fn() -> 2 + 2 end
     #Function<20.99386804/0 in :erl_eval.expr/5>
@@ -42,7 +42,7 @@ Shell itself is a process:
     iex(6)> self()
     #PID<0.85.0>
     
-## Sending Messages
+## 2. Sending Messages
 
     iex(1)> send(self(), :hello)
     :hello
@@ -62,7 +62,7 @@ To see contents of mailbox for a shell use:
     :world
     :ok
 
-## Receiving Messages
+## 3. Receiving Messages
 
 Let's write a simple program: dolphins.ex.
 
