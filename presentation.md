@@ -95,3 +95,24 @@ Re-start process (since it terminated):
  3. When message is received it is matched against a given pattern.
  4. _ is a catch-all pattern.
 
+# Replying to Messages
+
+Instead of printing, we can reply. See dolphin2 in dolphins.ex.
+
+We now require `From`, this is a process identifier:
+
+    iex(1)> c("dolphins.ex")
+    [Dolphins] 
+
+    iex(2)> dolphin2 = spawn(Dolphins, :dolphin2, [])
+    #PID<0.141.0>
+
+    iex(3)> send dolphin2, {self(), :do_a_flip}
+    {#PID<0.85.0>, :do_a_flip}
+
+We need to flush to see the messages we got:
+
+    iex(4)> flush()
+    "How about no?"
+    :ok
+    
