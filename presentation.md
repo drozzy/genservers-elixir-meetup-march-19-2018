@@ -323,4 +323,27 @@ Reference is there to allow us to demonitor the process.
     flush()
     > :ok
 
+# Names
+
+## The problem
+
+There is a problem if we keep using process ids to send messages.
+
+Consider a chef program in "chef.ex", that accepts orders for
+a dish and a temperature to cook it at.
+
+    c("chef.ex")
+    chef = Chef.start_chef()          
+
+    Chef.cook(chef, "steak", "rare")  
+    > "Excellent choice!"
+
+    Chef.cook(chef, "chicken", "rare")
+    > "What is wrong with you?"
+
+Now consider what happends when the chef process is gone:
+
+    Process.exit(chef, :heart_attack)
+    Chef.cook(chef, "fish", "well done")
+    > :timeout
 
