@@ -226,3 +226,18 @@ Now we can interact with our process in a nice way:
     > :not_found
 
 
+## Fridge with Timeout
+
+Let's try to issue a call to a non-existant process:
+
+    Kitchen.take(pid(0,250, 0), :juice)
+
+Receive waits for new message and never gets it. 
+We need to place a timeout. For this we use the "after" clase of receive construct.
+
+See kitchen.ex, and let's try it:
+
+    c("kitchen.ex")
+    Kitchen.take(pid(0,250,0), :beans)
+
+

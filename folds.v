@@ -126,7 +126,8 @@ silent! normal! zE
 154,178fold
 180,203fold
 205,227fold
-150,228fold
+229,241fold
+150,241fold
 1
 normal! zo
 1

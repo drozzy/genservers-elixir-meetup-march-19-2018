@@ -7,6 +7,8 @@ defmodule Kitchen do
     send pid, {self(), {:store, food}}
     receive do
       {pid, msg} -> msg
+    after 5000 ->
+      :timeout
     end
   end
 
@@ -14,6 +16,8 @@ defmodule Kitchen do
     send pid, {self(), {:take, food}}
     receive do
       {pid, msg} -> msg
+    after 5000 ->
+      :timeout
     end
   end
 
