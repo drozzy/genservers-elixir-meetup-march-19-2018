@@ -202,4 +202,27 @@ and now take some out:
     > {#PID<0.262.0>, :not_found}
     > :ok
 
-    
+## Fridge with Memory and Secret Messages    
+
+Sending messages to a process is annoying. 
+What we really want to do something like `Kitchen.store`.
+It is also annoying to "spawn" processes all the time.
+
+Let's write an API for our process to hide the messages, and process 
+spawning. See "kitchen.ex".
+
+Now we can interact with our process in a nice way:
+
+    c("kitchen.ex")
+    kitchen = Kitchen.start([:baking_soda])
+
+    Kitchen.store(kitchen, :water)
+    > :ok
+
+    Kitchen.take(kitchen, :water) 
+    > {:ok, :water}
+
+    Kitchen.take(kitchen, :juice)
+    > :not_found
+
+

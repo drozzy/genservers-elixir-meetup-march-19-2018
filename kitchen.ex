@@ -1,14 +1,19 @@
 defmodule Kitchen do
-  def fridge1() do
+  def start(food_list) do
+    spawn(__MODULE__, :fridge2, [food_list])
+  end
+
+  def store(pid, food) do
+    send pid, {self(), {:store, food}}
     receive do
-      {from, {:store, food}} ->
-        send from, {self(), :ok}
-        fridge1()
-      {from, {:take, _food}} ->
-        # What???
-        send from, {self(), :not_found}
-        fridge1()
-      :terminate -> :ok
+      {pid, msg} -> msg
+    end
+  end
+
+  def take(pid, food) do
+    send pid, {self(), {:take, food}}
+    receive do
+      {pid, msg} -> msg
     end
   end
 
