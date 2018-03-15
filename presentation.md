@@ -177,3 +177,29 @@ Now let's try to take some food:
     flush()
     > {#PID<0.228.0>, :not_found}
     
+## Fridge with Memory
+
+We can store state in the parameters of the recursive function.
+See `fridge2` in kitchen.ex
+
+Let's store some food in the fridge:
+
+    c("kitchen.ex")
+    fridge = spawn(Kitchen, :fridge2, [[:baking_soda]])  
+    send fridge, {self(), {:store, :milk}}
+    send fridge, {self(), {:store, :bacon}}
+    flush()
+    > {#PID<0.248.0>, :ok}
+    > {#PID<0.248.0>, :ok}
+    > :ok
+
+and now take some out:
+
+    send fridge, {self(), {:take, :bacon}}
+    send fridge, {self(), {:take, :turkey}}
+    flush()
+    > {#PID<0.262.0>, {:ok, :bacon}}
+    > {#PID<0.262.0>, :not_found}
+    > :ok
+
+    

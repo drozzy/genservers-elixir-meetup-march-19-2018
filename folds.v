@@ -124,7 +124,8 @@ silent! normal! zE
 98,117fold
 119,148fold
 154,178fold
-150,179fold
+180,203fold
+150,204fold
 1
 normal! zo
 1
@@ -137,7 +138,7 @@ normal! zc
 normal! zo
 150
 normal! zc
-let s:l = 150 - ((149 * winheight(0) + 26) / 53)
+let s:l = 150 - ((149 * winheight(0) + 28) / 57)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
