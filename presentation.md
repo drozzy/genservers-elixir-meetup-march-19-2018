@@ -373,4 +373,20 @@ process replied to us. But there is a problem... what if between:
 the process dies? The `whereis` will fail, program will crash!
 Other nasty cases.
 
+## The Second Solution
+
+Instead of chef replying with its own pid, it replies with a unique reference
+we sent it instead.
+See `cook` and `chef` in "chef.ex". It still works as expected:
+
+    ^C-a
+    iex
+    c("chef.ex")
+    Chef.start_chef()
+
+    Chef.cook("steak", "rare")
+    > "Excellent choice!"
+
+    Chef.cook("chicken", "hot")    
+    > "Coming right up!"
 

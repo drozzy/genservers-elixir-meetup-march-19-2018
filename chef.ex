@@ -20,10 +20,10 @@ defmodule Chef do
   end
 
   def cook(dish, temperature) do
-    send :chef, {self(), {dish, temperature}}
-    pid = Process.whereis(:chef)
+    ref = make_ref()
+    send :chef, {self(), ref, {dish, temperature}}
     receive do
-      {^pid, response} -> response
+      {^ref, response} -> response
     after 5000 ->
       :timeout
     end
@@ -31,16 +31,16 @@ defmodule Chef do
 
   def chef() do
     receive do
-      {from, {"steak", "rare"}} ->
-        send from, {self(), "Excellent choice!"}
-      {from, {"steak", _}} ->
-        send from, {self(), "Get out of my restaurant!"}
-      {from, {"chicken", "rare"}} ->
-        send from, {self(), "What is wrong with you?"}
-      {from, {"chicken", _}} ->
-        send from, {self(), "Coming right up!"}
-      {from, {_dish, _temperature}} ->
-        send from, {self(), "We don't serve that here."}
+      {from, ref, {"steak", "rare"}} ->
+        send from, {ref, "Excellent choice!"}
+      {from, ref, {"steak", _}} ->
+        send from, {ref, "Get out of my restaurant!"}
+      {from, ref, {"chicken", "rare"}} ->
+        send from, {ref, "What is wrong with you?"}
+      {from, ref, {"chicken", _}} ->
+        send from, {ref, "Coming right up!"}
+      {from, ref, {_dish, _temperature}} ->
+        send from, {ref, "We don't serve that here."}
     end
     chef()
   end
