@@ -1,13 +1,29 @@
 defmodule Chef do
 
   def start_chef() do
-    spawn(__MODULE__, :chef, [])
+    spawn(__MODULE__, :restarter, [])
   end
 
-  def cook(pid, dish, temperature) do
-    send pid, {self(), {dish, temperature}}
+  def restarter() do
+    Process.flag(:trap_exit, true)
+    pid = spawn_link(__MODULE__, :chef, [])
+    Process.register(pid, :chef)
+
     receive do
-      {pid, response} -> response
+      {:EXIT, pid, :normal} -> # not a crash
+        :ok
+      {:EXIT, pid, :shutdown} -> # manual shut-down
+        :ok
+      {:EXIT, pid, _} -> # crash
+        restarter()
+    end
+  end
+
+  def cook(dish, temperature) do
+    send :chef, {self(), {dish, temperature}}
+    pid = Process.whereis(:chef)
+    receive do
+      {^pid, response} -> response
     after 5000 ->
       :timeout
     end

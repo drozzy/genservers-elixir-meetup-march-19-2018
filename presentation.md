@@ -347,3 +347,30 @@ Now consider what happends when the chef process is gone:
     Chef.cook(chef, "fish", "well done")
     > :timeout
 
+## The First Solution
+
+We need to restart the process, and register the name in the
+global name registry. See `start_chef`, `restarter`, `cook` in "chef.ex".
+
+Cook no longer takes a pid and we can refer to different processes
+by the same name:
+
+    c("chef.ex")  
+    Chef.start_chef()
+    Chef.cook("steak", "rare")
+    > "Excellent choice!"
+
+    Process.exit(Process.whereis(:chef), :heart_attack)   
+    Chef.cook("steak", "well done")  
+    > "Get out of my restaurant!"
+
+Note, there is a need to match against a pid, so that we know the chef
+process replied to us. But there is a problem... what if between:
+
+    send :chef, {self(), {dish, temperature}}
+    pid = Process.whereis(:chef)
+
+the process dies? The `whereis` will fail, program will crash!
+Other nasty cases.
+
+
