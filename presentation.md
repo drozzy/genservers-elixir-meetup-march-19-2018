@@ -240,4 +240,87 @@ See kitchen.ex, and let's try it:
     c("kitchen.ex")
     Kitchen.take(pid(0,250,0), :beans)
 
+# Links, Traps and Monitors
+
+Now we will look at how to handle errors when processes fail.
+
+Link is a relationship between two processes, such that if
+one process fails, it makes the other process fail as well.
+
+Useful when we depend on some process and it crashes.
+Often better to restart all at the same time to recover.
+
+See "linkmon.ex"
+
+Notice it only crashes the shell if we link to it:
+
+    spawn(&Linkmon.myproc/0)           
+    > #PID<0.146.0>
+
+    Process.link(spawn(&Linkmon.myproc/0))
+    > true     
+    > ** (EXIT from #PID<0.140.0>) evaluator process exited with reason: :reason
+
+Spawn & link is prone to failure, since it can die before link is established.
+So there is a function that does both at once:
+
+    spawn_link(&Linkmon.myproc/0)         
+    > #PID<0.109.0>                                 
+    > ** (EXIT from #PID<0.107.0>) evaluator process exited with reason: :reason
+
+
+Trapping allows us to intercept the "EXIT" message. The process must set a flag:
+
+    Process.flag(:trap_exit, true)
+
+Now when we link to a failing process, we don't crash:
+
+    Process.link(spawn(&Linkmon.myproc/0))
+
+But instead get a message:
+
+    flush()
+    > {:EXIT, #PID<0.152.0>, :reason}
+
+Monitors are like links but are:
+
+1. Unidirectional
+2. Can be stacked (unlike links, which can't unlink an idividual prcoess)
+
+Let's setup a monitor:
+
+    :erlang.monitor(:process, spawn(fn() -> :timer.sleep(5000) end))
+    > #Reference<0.3296726473.3772514305.201422>
+
+    flush()
+    > {:DOWN, #Reference<0.3296726473.3772514305.201422>, :process, #PID<0.87.0>,
+    > :normal}
+   
+
+Just like links, there is a race condition between spawning and monitoring
+a process. So we have an operation that does both:
+
+    {pid, ref} = spawn_monitor(fn() -> receive do _ -> exit(:boom) end end)
+    > {#PID<0.120.0>, #Reference<0.3296726473.3772514305.202060>}
+
+    send pid, :die
+    > :die    
+
+    flush()
+    >{:DOWN, #Reference<0.3296726473.3772514305.202060>, :process, #PID<0.120.0>,
+    > :boom}
+
+Reference is there to allow us to demonitor the process.
+
+    {pid, ref} = spawn_monitor(fn() -> receive do _ -> exit(:boom) end end)
+    > {#PID<0.120.0>, #Reference<0.3296726473.3772514305.202060>}
+
+    :erlang.demonitor(ref)
+
+    send pid, :die
+    > :die    
+
+    flush()
+    > :ok
+
 
