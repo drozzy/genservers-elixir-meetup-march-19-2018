@@ -390,3 +390,45 @@ See `cook` and `chef` in "chef.ex". It still works as expected:
     Chef.cook("chicken", "hot")    
     > "Coming right up!"
 
+# Client-Server abstraction
+
+Client sends calls to the server, and server replies.
+
+We implemented in the chef example: chef was the server process, and
+the shell was the client. This is very common pattern.
+
+## Kitty Shop
+
+Let's create a cat shop. See `kitty_server.ex` for initial version.
+
+    c("kitty_server.ex")
+    > [KittyServer, KittyServer.Cat]
+
+    pid = KittyServer.start_link()                                           
+    cat1 = KittyServer.order_cat(pid, :carl, :brown, "loves to burn bridges")
+    > %KittyServer.Cat{color: :brown, description: "loves to burn bridges",
+    > name: :carl}
+
+    KittyServer.return_cat(pid, cat1)                                        
+    > :ok
+
+    KittyServer.order_cat(pid, :jimmy, :orange, "cuddly")                    
+    > %KittyServer.Cat{color: :brown, description: "loves to burn bridges",
+    > name: :carl}
+
+    KittyServer.order_cat(pid, :jimmy, :orange, "cuddly")                    
+    > %KittyServer.Cat{color: :orange, description: "cuddly", name: :jimmy}
+
+    KittyServer.return_cat(pid, cat1)                    
+    > :ok
+
+    KittyServer.close_shop(pid)                          
+    > :carl was set free.
+    > :ok
+    
+    KittyServer.close_shop(pid)
+    > ** (ErlangError) Erlang error: :noproc
+    >    kitty_server.ex:41: KittyServer.close_shop/1
+
+
+
