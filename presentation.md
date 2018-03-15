@@ -147,4 +147,33 @@ Sending `:fish` message wil stop the process:
     "So long and thanks for all the fish!"
     :ok
 
+# Storing State
 
+We need to be able to store state.
+
+## Fridge
+
+Let's implement a fridge, that provides two operations:
+
+1. Store food
+2. Take food
+
+See `fridge1` in kitchen.ex
+
+Let's store some food in the fridge and try to take some out:
+
+    c("kitchen.ex")   
+    fridge = spawn(Kitchen, :fridge1, [])  
+    send fridge, {self(), {:store, :apple}}
+    
+See that we got a reply:
+
+    flush()
+    > {#PID<0.228.0>, :ok}
+
+Now let's try to take some food: 
+
+    send fridge, {self(), {:take, :apple}} 
+    flush()
+    > {#PID<0.228.0>, :not_found}
+    
