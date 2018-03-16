@@ -5,7 +5,7 @@ defmodule KittyServer do
 
   ### Client API
   def start_link() do
-    spawn_link(&init/0)
+    MyServer.start_link(__MODULE__, [])
   end
 
   ## Synchronous call
@@ -24,25 +24,25 @@ defmodule KittyServer do
   end
 
   ### Server functions
-  defp init() do
-    MyServer.loop(KittyServer, [])
+  def init([]) do
+    []
   end
 
-  def handle_call({:order, name, color, description}, pid, ref, cats) do
+  def handle_call({:order, name, color, description}, from, cats) do
       cond do
         cats === [] ->
           # No cats left - go make one!
-          send pid, {ref, make_cat(name, color, description)}
+          MyServer.reply(from, make_cat(name, color, description))
           cats 
         cats !== [] ->
           # Take a random one from the stock instead.
-          send pid, {ref, hd(cats)}
+          MyServer.reply(from, :ok)
           tl(cats)
       end
   end
 
-  def handle_call(:terminate, pid, ref, cats) do
-      send pid, {ref, :ok}
+  def handle_call(:terminate, from, cats) do
+      MyServer.reply(from, :ok)
       terminate(cats)
   end
 
@@ -57,6 +57,6 @@ defmodule KittyServer do
 
   defp terminate(cats) do
     for c <- cats, do: IO.puts("#{inspect c.name} was set free.")
-    :ok
+    exit(:normal)
   end
 end

@@ -465,7 +465,7 @@ on sync (let's name it a "call") and async (let's name it a "cast"):
 
     def loop(module, state) do
         receive do
-            {:sync, msg} -> module.handle_call(msg, state)
+            {:sync, pid, ref, msg} -> module.handle_call(msg, pid, ref, state)
             {:async, msg} -> module.handle_cast(msg, state)
         end
         loop(...)
@@ -476,4 +476,72 @@ See:
   send appropriate messages
 - "loop" function 
 - `handle_` functions in `kitty_server.ex`
+
+## Leaky Abstraction
+
+There are some things in KittyShop that have no business being there:
+
+- pid & ref terms that we use to "send" messages
+- our `start_link` calls system "spawn" 
+- our `init` calls `MyServer.loop` (which is private to MyServer)
+
+Let's move it all out into MyServer:
+
+1. Make `loop` private
+2. Combine `{pid, ref}` into one tuple:
+
+    def loop(module, state) do
+        receive do
+            {:sync, pid, ref, msg} -> module.handle_call(msg, {pid, ref}, state)
+            {:async, msg} -> module.handle_cast(msg, state)
+        end
+        loop(...)
+    end
+
+3. Provide a `reply` function (MyServer):
+
+    def reply({pid, ref}, reply) do
+        send pid, {ref, reply}
+    end
+
+4. Make use of `reply` in `handle_call` (KittyServer)
+
+5. Create (private) `init` in MyServer that starts the loop,
+   and calls KittyServer init (which is now just a state transform)
+
+6. Create `start_link` in MyServer that starts the loop,
+   and make our KittyServer `start_link` call that.
+
+7. Terminate now needs to exit explicitly (KittyServer)
+
+Let's try it out:
+
+    iex
+    c("my_server.ex")
+    c("kitty_server.ex")
+    pid = KittyServer.start_link()
+    > #PID<0.102.0>
+
+    cat = KittyServer.order_cat(pid, :spiffy, :orange, "He's a happy camper!")
+    > %KittyServer.Cat{color: :orange, description: "He's a happy camper!",
+    > name: :spiffy}
+
+    KittyServer.return_cat(pid, cat)
+    > :ok
+    
+    KittyServer.close_shop(pid)
+    > :spiffy was set free.
+    > :ok
+
+    Process.alive?(pid)
+    > false
+
+Our KittyServer is now only 62 lines of code, but more importantly:
+
+- contains only Cat specific stuff
+- no naked message passing
+- no process spawning
+- everything "generic" abstracted away into MyServer
+
+What is MyServer?
 

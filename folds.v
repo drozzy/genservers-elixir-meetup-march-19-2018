@@ -131,10 +131,12 @@ silent! normal! zE
 350,374fold
 376,391fold
 326,391fold
-1,391fold
 400,431fold
 433,449fold
-393,449fold
+451,478fold
+480,546fold
+393,546fold
+1,546fold
 1
 normal! zo
 150
@@ -157,11 +159,13 @@ normal! zc
 normal! zo
 393
 normal! zc
-let s:l = 451 - ((450 * winheight(0) + 28) / 57)
+1
+normal! zc
+let s:l = 1 - ((0 * winheight(0) + 28) / 57)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-451
+1
 normal! 0
 let &so = s:so_save | let &siso = s:siso_save
 doautoall SessionLoadPost
