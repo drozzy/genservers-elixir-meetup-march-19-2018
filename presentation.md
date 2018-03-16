@@ -1,3 +1,35 @@
+
+ ██████╗ ███████╗███╗   ██╗      ███████╗███████╗██████╗ ██╗   ██╗███████╗██████╗ ███████╗
+██╔════╝ ██╔════╝████╗  ██║      ██╔════╝██╔════╝██╔══██╗██║   ██║██╔════╝██╔══██╗██╔════╝
+██║  ███╗█████╗  ██╔██╗ ██║█████╗███████╗█████╗  ██████╔╝██║   ██║█████╗  ██████╔╝███████╗
+██║   ██║██╔══╝  ██║╚██╗██║╚════╝╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝██╔══╝  ██╔══██╗╚════██║
+╚██████╔╝███████╗██║ ╚████║      ███████║███████╗██║  ██║ ╚████╔╝ ███████╗██║  ██║███████║
+ ╚═════╝ ╚══════╝╚═╝  ╚═══╝      ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝
+
+
+.88b  d88.  .d88b.  d8888b. d88888b      d888888b db   db  .d8b.  d8b   db      
+88'YbdP`88 .8P  Y8. 88  `8D 88'          `~~88~~' 88   88 d8' `8b 888o  88      
+88  88  88 88    88 88oobY' 88ooooo         88    88ooo88 88ooo88 88V8o 88      
+88  88  88 88    88 88`8b   88~~~~~         88    88~~~88 88~~~88 88 V8o88      
+88  88  88 `8b  d8' 88 `88. 88.             88    88   88 88   88 88  V888      
+YP  YP  YP  `Y88P'  88   YD Y88888P         YP    YP   YP YP   YP VP   V8P      
+
+                                                                                
+.88b  d88. d88888b d88888b d888888b .d8888.      d888888b db   db d88888b 
+88'YbdP`88 88'     88'     `~~88~~' 88'  YP      `~~88~~' 88   88 88'     
+88  88  88 88ooooo 88ooooo    88    `8bo.           88    88ooo88 88ooooo 
+88  88  88 88~~~~~ 88~~~~~    88      `Y8b.         88    88~~~88 88~~~~~ 
+88  88  88 88.     88.        88    db   8D         88    88   88 88.     
+YP  YP  YP Y88888P Y88888P    YP    `8888Y'         YP    YP   YP Y88888P 
+                                                                          
+                                                                          
+d88888b db    db d88888b 
+88'     `8b  d8' 88'     
+88ooooo  `8bd8'  88ooooo 
+88~~~~~    88    88~~~~~ 
+88.        88    88.     
+Y88888P    YP    Y88888P 
+
 # Three Primitives Required for Concurrency
 
 1. Spawning new processes
@@ -224,7 +256,6 @@ Now we can interact with our process in a nice way:
 
     Kitchen.take(kitchen, :juice)
     > :not_found
-
 
 ## Fridge with Timeout
 
@@ -544,4 +575,46 @@ Our KittyServer is now only 62 lines of code, but more importantly:
 - everything "generic" abstracted away into MyServer
 
 What is MyServer?
+
+## GenServer
+
+MyServer is basically our own version of GenServer.  
+GenServer is part of OTP.
+
+OTP is set of libraries that extract many of the 
+generic aspects of concurrent programming.
+
+- if you have 100s of components, all reusing MyServer
+  functionality, it increases understanding of the sytem
+- less errors due to not handling complex edge cases
+  (e.g. monitor, demonitor)
+- testing code is easier, as we only need to
+  provide old state, input and observe new state
+- hundreds of years worth of testing and usage
+  by community makes these abstractions battle-hardened
+
+Let's throw out MyServer and rewrite our KittyServer with GenServer
+instead. See `kitty_server.ex`:
+
+    c("kitty_server.ex")
+    {:ok, pid} = KittyServer.start_link()
+    send pid, "Test"
+    > Unexpected message: "Test"
+    > "Test"
+
+    cat = KittyServer.order_cat(pid, :spiffy, :white, "Very active!")
+    > %KittyServer.Cat{color: :white, description: "Very active!", name: :spiffy}
+    
+    KittyServer.return_cat(pid, cat)
+    > :ok
+
+    cat = KittyServer.order_cat(pid, :jabby, :black, "Bites all the time")
+    > %KittyServer.Cat{color: :white, description: "Very active!", name: :spiffy}
+    
+    KittyServer.return_cat(pid, cat)                                      
+    > :ok
+
+    > KittyServer.close_shop(pid)                                           
+    > :spiffy was set free.
+    > :ok
 

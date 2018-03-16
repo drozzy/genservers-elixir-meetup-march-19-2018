@@ -30,6 +30,10 @@ To restore vim folds, issue from within vim:
 
     :source folds.v
 
+Disable spell-checking (so that there are no red underlines):
+
+    :set nospell
+
 ## References
 
 Based on the idea of using git for a live coding sessions:
