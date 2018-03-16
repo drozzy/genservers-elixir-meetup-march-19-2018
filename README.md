@@ -38,4 +38,10 @@ https://blog.jayway.com/2015/03/30/using-git-commits-to-drive-a-live-coding-sess
 Prepared by utilizing interactive rebases:
 https://www.atlassian.com/git/tutorials/rewriting-history#git-rebase-i
 
+Blatantly copied code and translated from Erlang to Elixir from
+"Learn You Some Erlang" by Fred Hebert. Specifically used chapters:
 
+- http://learnyousomeerlang.com/the-hitchhikers-guide-to-concurrency
+- http://learnyousomeerlang.com/more-on-multiprocessing
+- http://learnyousomeerlang.com/errors-and-processes
+- http://learnyousomeerlang.com/what-is-otp
