@@ -448,4 +448,32 @@ synchronous "call" to `order_cat` and `close_shop`.
 See `my_server.ex`, function call and modified `kitty_server.ex`.
 Our Kitty Shop went from 86 lines to 65!
 
+## Loop
+
+Every process has a loop where messages are pattern matched.
+We can extract it like so:
+
+    def loop(module, state) do
+        receive do
+            msg -> module.handle(msg, state)
+        end
+        loop(...)
+    end
+
+But we also have "sync" and "async" messages. So we need to pattern match
+on sync (let's name it a "call") and async (let's name it a "cast"):
+
+    def loop(module, state) do
+        receive do
+            {:sync, msg} -> module.handle_call(msg, state)
+            {:async, msg} -> module.handle_cast(msg, state)
+        end
+        loop(...)
+    end
+
+See:
+- "call" and "cast" functions in `my_server` which now
+  send appropriate messages
+- "loop" function 
+- `handle_` functions in `kitty_server.ex`
 
