@@ -10,17 +10,7 @@ defmodule KittyServer do
 
   ## Synchronous call
   def order_cat(pid, name, color, description) do
-    ref = :erlang.monitor(:process, pid)
-    send pid, {self(), ref, {:order, name, color, description}}
-    receive do
-      {^ref, cat} ->
-        :erlang.demonitor(ref, [:flush])
-        cat
-      {:DOWN, ^ref, :process, ^pid, reason} ->
-        :erlang.error(reason)
-    after 5000 ->
-        :erlang.error(:timeout)
-    end
+    MyServer.call pid, {:order, name, color, description}
   end
 
   ## Asynchronous call
@@ -31,17 +21,7 @@ defmodule KittyServer do
 
   ## Synchronous call
   def close_shop(pid) do
-    ref = :erlang.monitor(:process, pid)
-    send pid, {self(), ref, :terminate}
-    receive do
-      {ref, :ok} ->
-        :erlang.demonitor(ref, [:flush])
-        :ok
-      {:DOWN, ^ref, :process, ^pid, reason} ->
-        :erlang.error(reason)
-    after 5000 ->
-        :erlang.error(:timeout)
-    end
+    MyServer.call pid, :terminate
   end
 
   ### Server functions

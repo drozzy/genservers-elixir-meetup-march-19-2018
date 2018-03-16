@@ -430,5 +430,22 @@ Let's create a cat shop. See `kitty_server.ex` for initial version.
     > ** (ErlangError) Erlang error: :noproc
     >    kitty_server.ex:41: KittyServer.close_shop/1
 
+## Extract Common Parts
+
+Let's extract common parts of kitty shop and chef examples:
+
+- setting up monitors
+- timeouts
+- receiving data
+- main loop
+- initialization
+
+### Synchronous Calls
+
+We can extract common parts of the 
+synchronous "call" to `order_cat` and `close_shop`.
+
+See `my_server.ex`, function call and modified `kitty_server.ex`.
+Our Kitty Shop went from 86 lines to 65!
 
 
